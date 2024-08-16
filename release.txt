@@ -1,0 +1,13 @@
+docker buildx build --platform linux/amd64 -t contasoft-ui-dev:latest . --load
+
+
+docker run -d -p 3000:3000 --name my-nextjs-container contasoft-ui-dev:latest
+
+az login
+az acr login --name acrcontasoftdev
+
+docker tag contasoft-ui-dev:latest acrcontasoftdev.azurecr.io/contasoft-ui-dev:latest
+docker tag contasoft-ui-dev:latest acrcontasoftdev.azurecr.io/contasoft-ui-dev:0.0.0
+
+docker push acrcontasoftdev.azurecr.io/contasoft-ui-dev:latest
+docker push acrcontasoftdev.azurecr.io/contasoft-ui-dev:0.0.0
