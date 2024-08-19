@@ -2,14 +2,14 @@ import React from 'react';
 import { MagnifyingGlassIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import Link from 'next/link';
 
-export function TableHeader({ activeTab, onTabChange, selectedFilter, onFilterChange, categorias, proveedores }) {
+export function TableHeader({ title, buttonAdd, activeTab, onTabChange, selectedFilter, onFilterChange, categorias, proveedores }) {
   const tabs = ["Todos", "Categoria", "Proveedor", "Prestados"];
 
   return (
     <div className="p-4 bg-white shadow rounded-t-lg">
       <div className="mb-8 flex items-center justify-between gap-8">
         <div>
-          <h5 className="text-2xl font-bold text-gray-900">Listado del inventario</h5>
+          <h5 className="text-2xl font-bold text-gray-900">{title}</h5>
         </div>
         <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
           <Link href="/nuevo-inventario" passHref>
@@ -17,7 +17,7 @@ export function TableHeader({ activeTab, onTabChange, selectedFilter, onFilterCh
               className="px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center gap-2"
             >
               <UserPlusIcon className="h-4 w-4" />
-              Agregar Inventario
+              {buttonAdd}
             </button>
           </Link>
         </div>

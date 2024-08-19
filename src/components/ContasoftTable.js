@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
@@ -45,11 +45,7 @@ export function ContasoftTable() {
         fetchData();
     }, []);
 
-    useEffect(() => {
-        filterInventario();
-    }, [activeTab, selectedFilter, inventario]);
-
-    const filterInventario = () => {
+      const filterInventario = useCallback(() => {
         let filtered = inventario;
         
         switch (activeTab) {
@@ -71,11 +67,17 @@ export function ContasoftTable() {
                 break;
             default:
                 filtered = inventario;
+                
         }
         
         setFilteredInventario(filtered);
         setCurrentPage(1);  
-    };
+    }, [activeTab, selectedFilter, inventario]);
+
+    useEffect(() => {
+        filterInventario();
+    }, [filterInventario]);
+
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -113,6 +115,8 @@ export function ContasoftTable() {
     return (
         <div className="bg-white shadow rounded-lg">
             <TableHeader
+                title="Listado del inventario"
+                buttonAdd="Agregar Inventario"
                 activeTab={activeTab} 
                 onTabChange={handleTabChange}
                 selectedFilter={selectedFilter}
@@ -134,6 +138,7 @@ export function ContasoftTable() {
                     <tbody className="bg-white divide-y divide-gray-200">
                         {currentItems.map((item, index) => (
                             <TableRow
+
                                 key={item.id_inventario}
                                 item={item}
                                 isLast={index === currentItems.length - 1}

@@ -1,6 +1,7 @@
 import { PencilIcon, EyeIcon, HandRaisedIcon } from "@heroicons/react/24/solid";
-
+import { useRouter } from "next/navigation";
 export function TableRow({ item, isLast, onView, onLend }) {
+  const router = useRouter();
   const { 
     id_inventario,
     nombre_inventario, 
@@ -15,6 +16,7 @@ export function TableRow({ item, isLast, onView, onLend }) {
   
   const rowClass = isLast ? "p-4" : "p-4 border-b border-gray-200";
   const cellClass = "px-6 py-4 whitespace-nowrap";
+  
 
   return (
     <tr>
@@ -25,7 +27,7 @@ export function TableRow({ item, isLast, onView, onLend }) {
         <p className="text-sm text-gray-600">{cantidad}</p>
       </td>
       <td className={`${rowClass} ${cellClass}`}>
-        <p className="text-sm text-gray-600">${precio.toFixed(2)}</p>
+        <p className="text-sm text-gray-600">Lps.{precio.toFixed(2)}</p>
       </td>
       <td className={`${rowClass} ${cellClass}`}>
         <p className="text-sm text-gray-600">{observacion}</p>
@@ -44,7 +46,7 @@ export function TableRow({ item, isLast, onView, onLend }) {
       </td>
       <td className={`${rowClass} ${cellClass}`}>
         <div className="flex space-x-2">
-          <button onClick={() => onView(id_inventario)} className="text-blue-600 hover:text-blue-800">
+        <button onClick={(e) => router.push(`/inventario/${id_inventario}`)} className="text-blue-600 hover:text-blue-800">
             <EyeIcon className="h-5 w-5" />
           </button>
           <button onClick={() => onLend(id_inventario)} className="text-green-600 hover:text-green-800">
