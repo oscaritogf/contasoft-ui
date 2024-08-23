@@ -1,8 +1,7 @@
-//src/app/inventario/[id]/page.js
 "use client";
 
 import React, { useState, useEffect } from "react";
-//import { useRouter } from 'next/router';
+import { useRouter } from "next/navigation";
 import FormInventario from "../../nuevo-inventario/components/FormInventario";
 import Sidebar from "@/components/Sidebar";
 import {
@@ -13,11 +12,8 @@ import {
 } from "@/services/inventario";
 import InfoCard from "../../nuevo-inventario/components/InfoCard";
 import ModalUpdate from "../../nuevo-inventario/components/ModalUpdate";
-import { useRouter } from "next/navigation";
-import { ErrorResponse } from "../../../utils/errors";
 import Notification from "@/components/Notification";
 import ConfirmArchiveModal from "@/components/ConfirmArchiveModal";
-
 
 const Header = ({ toggleSidebar }) => (
   <header className="bg-blue-500 text-white p-4 flex justify-between items-center">
@@ -53,39 +49,48 @@ export default function InventarioUpdate(props) {
   const [providers, setProviders] = useState([]);
   const [categories, setCategories] = useState([]);
   const [notification, setNotification] = useState(null);
-  
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
     async function fetchData() {
       try {
+        setLoading(true);
         const item = await GetInventarioIten(id);
+        if (!item) {
+          router.push('/404');
+          return;
+        }
         setItemData(item);
 
-        const providerData = await GetProveedores();
-        setProviders(providerData);
+        const [providerData, categoryData] = await Promise.all([
+          GetProveedores(),
+          GetCategorias()
+        ]);
 
-        const categoryData = await GetCategorias();
+        setProviders(providerData);
         setCategories(categoryData);
 
-        if (providerData && providerData.length > 0) {
-          const provider = providerData.find(
-            (provider) => provider.id_proveedor === item.id_proveedor
-          );
-          setProviderName(provider ? provider.nombre : "Desconocido");
-        }
+        const provider = providerData.find(p => p.id_proveedor === item.id_proveedor);
+        const category = categoryData.find(c => c.id_categoria === item.id_categoria);
 
-        if (categoryData && categoryData.length > 0) {
-          const category = categoryData.find(
-            (category) => category.id_categoria === item.id_categoria
-          );
-          setCategoryName(category ? category.nombre : "Desconocido");
-        }
+        setProviderName(provider ? provider.nombre : "Desconocido");
+        setCategoryName(category ? category.nombre : "Desconocido");
       } catch (error) {
-        const errorsResponse = ErrorResponse(error);
-        if (errorsResponse !== "") {
-          router.push(errorsResponse);
+        if (error.message === 'Unauthorized') {
+          localStorage.removeItem('token');
+          router.push('/login');
+        } else {
+          console.error("Error al cargar los datos:", error);
+          router.push('/404');
         }
-        console.error("Error al cargar los datos:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -94,9 +99,7 @@ export default function InventarioUpdate(props) {
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  const handleEditClick = () => {
-    setIsModalOpen(true);
-  };
+  const handleEditClick = () => setIsModalOpen(true);
 
   const handleArchiveClick = () => {
     if (itemData.esta_prestado) {
@@ -111,7 +114,7 @@ export default function InventarioUpdate(props) {
 
   const handleArchiveConfirm = async () => {
     try {
-      await  ArchivarInventarioItem(id);
+      await ArchivarInventarioItem(id);
       setNotification({
         type: "success",
         message: "El ítem ha sido archivado con éxito.",
@@ -129,7 +132,6 @@ export default function InventarioUpdate(props) {
 
   const handleSubmit = (formData) => {
     try {
-     
       console.log("Datos actualizados:", formData);
       setIsModalOpen(false);
       setNotification({
@@ -146,6 +148,14 @@ export default function InventarioUpdate(props) {
     }
   };
 
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Cargando...</div>;
+  }
+
+  if (!itemData) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col h-screen">
       <Header toggleSidebar={toggleSidebar} />
@@ -155,21 +165,19 @@ export default function InventarioUpdate(props) {
           closeSidebar={() => setSidebarOpen(false)}
         />
         <div className="flex flex-1 justify-center items-center p-4">
-          {itemData && (
-            <InfoCard
-              title={itemData.nombre}
-              provider={providerName}
-              category={categoryName}
-              quantity={itemData.cantidad}
-              price={itemData.precio}
-              observations={itemData.observacion}
-              timesBorrowed={itemData.veces_prestado}
-              isBorrowed={itemData.esta_prestado}
-              archived={itemData.archivado}
-              onEditClick={handleEditClick}
-              onArchiveClick={handleArchiveClick}
-            />
-          )}
+          <InfoCard
+            title={itemData.nombre}
+            provider={providerName}
+            category={categoryName}
+            quantity={itemData.cantidad}
+            price={itemData.precio}
+            observations={itemData.observacion}
+            timesBorrowed={itemData.veces_prestado}
+            isBorrowed={itemData.esta_prestado}
+            archived={itemData.archivado}
+            onEditClick={handleEditClick}
+            onArchiveClick={handleArchiveClick}
+          />
         </div>
       </div>
       <ModalUpdate isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>

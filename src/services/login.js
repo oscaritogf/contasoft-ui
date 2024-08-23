@@ -1,6 +1,10 @@
+//src/services/login
+import settings from "./settings";
+
 export async function LoginUser(userLogin) {
     try {
-        const response = await fetch(`http://localhost:8000/login/custom`, {
+        
+        const response = await fetch(`${settings.domain}/login/custom`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

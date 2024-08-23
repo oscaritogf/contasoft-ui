@@ -1,5 +1,3 @@
-// pages/login.js
-
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -10,7 +8,6 @@ import { LoginFormValidator } from '@/utils/utils';
 
 import ErrorNotification from '@/components/ErrorNotification';
 
-
 const Login = () => {
 
     const router = useRouter();
@@ -19,7 +16,6 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [warningMessage, setWarningMessage] = useState([]);
 
-  
     useEffect(() => {
         console.log('Cleaning localStorage');
         localStorage.removeItem('token');
@@ -52,16 +48,16 @@ const Login = () => {
         }
     }
 
-
     return (
-        <div className="flex min-h-screen  justify-center my-7 ">
-            <div className="w-full max-w-md">
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-blue-400 to-blue-300 ">
+            <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-md">
             { warningMessage.length > 0 && <ErrorNotification errors={warningMessage} /> }
-                <h1 className="text-3xl font-bold text-center">Login</h1>
+                <h1 className="text-3xl font-bold text-center">Bienvenido </h1>
+                <h3 className="font-bold text-center">Ingresa tus credenciales</h3>
                 <form className="mt-6">
                     <div>
                         <label htmlFor="email" className="block text-xs font-semibold text-gray-600 uppercase">
-                            E-mail
+                            Correo
                         </label>
                         <input
                             id="email"
@@ -69,7 +65,7 @@ const Login = () => {
                             value={email}
                             onChange={ (e) => setEmail( e.target.value ) }
                             name="email"
-                            placeholder=""
+                            placeholder="Ingresa un correo válido"
                             autoComplete="email"
                             className="w-full p-2 mt-1 border border-gray-300 rounded-md" 
                             required 
@@ -77,7 +73,7 @@ const Login = () => {
                     </div>
                     <div className="mt-4">
                         <label htmlFor="password" className="block text-xs font-semibold text-gray-600 uppercase">
-                            Password
+                            Contraseña
                         </label>
                         <input
                             id="password"
@@ -85,7 +81,7 @@ const Login = () => {
                             value={password}
                             onChange={ (e) => setPassword( e.target.value ) }
                             name="password"
-                            placeholder=""
+                            placeholder="Ingresa tu contraseña"
                             autoComplete="current-password"
                             className="w-full p-2 mt-1 border border-gray-300 rounded-md" 
                             required

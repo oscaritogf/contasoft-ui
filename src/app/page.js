@@ -1,3 +1,4 @@
+//src/app/page.js
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -5,6 +6,7 @@ import ContasoftCard from "@/components/ContasoftCard";
 import { ContasoftTable } from "@/components/ContasoftTable";
 import Sidebar from '@/components/Sidebar';
 import { GetInventarioElementos, GetPrestamoElementos, GetConEntrega, GetUsuariosEntrega} from "@/services/inventario";
+import { useRouter } from 'next/navigation';
 
 const Header = ({ toggleSidebar }) => (
   <header className="bg-blue-500 text-white p-4 flex justify-between items-center">
@@ -29,6 +31,7 @@ const Header = ({ toggleSidebar }) => (
 );
 
 export default function Home() {
+  const router = useRouter();
   const [inventarioCount, setInventarioCount] = useState(null);
   const [prestamocount, setPrestamoCount] = useState(null);
   const [entregaCount, setEntregaCount] = useState(null);
@@ -38,12 +41,17 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if(!token){
+      router.push('/login');
+      return;
+    }
     async function fetchData() {
       try {
-        const inventarioData = await GetInventarioElementos();
-        const prestamoData = await GetPrestamoElementos();
-        const entregaData = await GetConEntrega();
-        const usuariosData = await GetUsuariosEntrega();
+        const inventarioData = await GetInventarioElementos(token);
+        const prestamoData = await GetPrestamoElementos(token);
+        const entregaData = await GetConEntrega(token);
+        const usuariosData = await GetUsuariosEntrega(token);
 
         setInventarioCount(inventarioData[0].total_elementos);
         setPrestamoCount(prestamoData[0].total_elementos_prestados);
@@ -51,10 +59,14 @@ export default function Home() {
         setUsuariosTardios(usuariosData);
       } catch (error) {
         console.error("Error fetching data:", error);
+        if(error.message === 'Unauthorized'){
+          localStorage.removeItem('token');
+          router.push('/login');
+        }
       }
     }
     fetchData();
-  }, []);
+  }, [router]);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const openModal = () => setModalOpen(true);

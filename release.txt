@@ -7,7 +7,7 @@ az login
 az acr login --name acrcontasoftdev
 
 docker tag contasoft-ui-dev:latest acrcontasoftdev.azurecr.io/contasoft-ui-dev:latest
-docker tag contasoft-ui-dev:latest acrcontasoftdev.azurecr.io/contasoft-ui-dev:0.0.0
+docker tag contasoft-ui-dev:latest acrcontasoftdev.azurecr.io/contasoft-ui-dev:0.1.6
 
 docker push acrcontasoftdev.azurecr.io/contasoft-ui-dev:latest
-docker push acrcontasoftdev.azurecr.io/contasoft-ui-dev:0.0.0
+docker push acrcontasoftdev.azurecr.io/contasoft-ui-dev:0.1.6

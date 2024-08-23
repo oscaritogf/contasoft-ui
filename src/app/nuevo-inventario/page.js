@@ -40,20 +40,30 @@ export default function InventarioCrear() {
 
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token){
+      router.push('/login');
+      return;
+    }
     async function fetchData() {
       try {
-        const categoriesData = await GetCategorias();
-        const providersData = await GetProveedores();
+        const categoriesData = await GetCategorias(token);
+        const providersData = await GetProveedores(token);
         setCategories(categoriesData);
         setProviders(providersData);
       } catch (error) {
         console.error('Error al cargar los datos:', error);
+        if(error,message === 'Unauthorized'){
+          localStorage.removeItem('token');
+          router.push('/login');
+
+        }
         setNotification({ type: 'error', message: 'Error al cargar los datos' });
       }
     }
 
     fetchData();
-  }, []);
+  }, [router]);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
